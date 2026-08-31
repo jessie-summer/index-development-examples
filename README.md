@@ -1,6 +1,6 @@
 # Index Development - Illustrative Code Samples
 
-Independently written Python examples of common workflows in equity index development: data QC, sample selection, weighting, and evaluation. Built for learning and portfolio purposes; all schemas and parameters are synthetic and illustrative.
+An end-to-end Python workflow for equity index development, covering selected common use cases in 1) data QC, 2) sample selection, 3) weighting and capping, and 4) backtesting and evaluation. Built to demonstrate workflow and coding approaches using fully synthetic, illustrative data.
 
 ## Files (in reading order)
 
