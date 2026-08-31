@@ -60,4 +60,4 @@ def select_industry_loop(snap, n, by='free_float_mcap'):
         picked += d.loc[d['industry'] == ind].nlargest(q, by)['ticker'].tolist()
     rest = d.loc[~d['ticker'].isin(picked)]
     picked += rest.nlargest(n - len(picked), by)['ticker'].tolist()
-    return sorted(picked)
+    return picked

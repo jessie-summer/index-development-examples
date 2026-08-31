@@ -1,6 +1,6 @@
 # Demo of the numbers an index is usually evaluated on before launch.
 # Situation 1: NAV backtest -> fixed units between rebalances (weights become
-#              share counts at the rebalance close, no look-ahead, continuous)
+#              share counts at the rebalance close)
 # Situation 2: performance -> annualized return / volatility / max drawdown,
 #              tracking error against a benchmark
 # Situation 3: turnover at each rebalance
@@ -14,12 +14,19 @@ import pandas as pd
 def nav_backtest(prices, weight_book, base=1000.0):
     # prices: wide dataframe date x ticker, adjusted / total-return prices;
     # weight_book: {rebalance_date: weight series}
-    # held names must have complete prices - missing prices raise instead of
-    # silently dropping the position from the portfolio value
+    # held names must exist in the price table with complete prices - both
+    # cases raise instead of silently dropping the position from the value;
+    # weights apply from the rebalance close onward (whether the weight book
+    # itself was built point-in-time is up to the caller)
     rdates = sorted(weight_book.keys())
     not_in_index = [d for d in rdates if d not in prices.index]
     if not_in_index:
         raise ValueError('rebalance dates not in price index: %s' % not_in_index)
+    for rd in rdates:
+        held = weight_book[rd][weight_book[rd] > 0]
+        absent = held.index.difference(prices.columns)
+        if len(absent):
+            raise ValueError('held names not in price table: %s' % list(absent))
     nav = pd.Series(index=prices.index, dtype=float)
     nav_val = base
     for i, rd in enumerate(rdates):

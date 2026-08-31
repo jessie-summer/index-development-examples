@@ -12,7 +12,9 @@
 import pandas as pd
 
 
-def pool_weight(snap, pool_weights={'core': 0.7, 'noncore': 0.3}):
+def pool_weight(snap, pool_weights=None):
+    if pool_weights is None:
+        pool_weights = {'core': 0.7, 'noncore': 0.3}
     d = snap.copy()
     unknown = set(d['layer']) - set(pool_weights)
     if unknown:
@@ -26,7 +28,9 @@ def pool_weight(snap, pool_weights={'core': 0.7, 'noncore': 0.3}):
     return d
 
 
-def weight_with_caps(snap, caps={'core': 0.10, 'noncore': 0.04}, max_iter=200):
+def weight_with_caps(snap, caps=None, max_iter=200):
+    if caps is None:
+        caps = {'core': 0.10, 'noncore': 0.04}
     d = snap.copy()
     cap_arr = d['layer'].map(caps).astype(float)
     if cap_arr.isna().any():
@@ -52,8 +56,9 @@ def weight_with_caps(snap, caps={'core': 0.10, 'noncore': 0.04}, max_iter=200):
     return d
 
 
-def apply_segment_cap(d, caps={'core': 0.10, 'noncore': 0.04},
-                      segment='noncore', total_cap=0.35, max_iter=50):
+def apply_segment_cap(d, caps=None, segment='noncore', total_cap=0.35, max_iter=50):
+    if caps is None:
+        caps = {'core': 0.10, 'noncore': 0.04}
     d = d.copy()
     seg = (d['layer'] == segment).values
     cap_arr = d['layer'].map(caps).astype(float)

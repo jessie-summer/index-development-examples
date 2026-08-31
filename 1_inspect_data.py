@@ -45,9 +45,17 @@ def missing_rates(df, expected_missing=('dividend',)):
 
 
 def fill_prices(df, limit=5):
-    # short gaps forward-filled, anything longer dropped
+    # gaps of up to `limit` days are filled in full; longer gaps are left
+    # unfilled entirely (a partially filled suspension is a stale price) and dropped
+    def fill_one(s):
+        isna = s.isna()
+        gap_id = (~isna).cumsum()
+        gap_len = isna.groupby(gap_id).transform('sum')
+        fillable = isna & (gap_len <= limit)
+        return s.where(~fillable, s.ffill())
+
     out = df.sort_values(['ticker', 'date']).copy()
-    out['close'] = out.groupby('ticker')['close'].ffill(limit=limit)
+    out['close'] = out.groupby('ticker')['close'].transform(fill_one)
     return out.dropna(subset=['close']).reset_index(drop=True)
 
 
